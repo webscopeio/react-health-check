@@ -6,6 +6,8 @@
 npm install --save react-detect-offline-api
 ```
 
+[Demo](https://webscopeio.github.io/react-detect-offline-api/)
+
 ## Usage
 
 ```tsx
@@ -49,4 +51,4 @@ Please note that if a request is blocked by CORS policy, this component will not
    
 ## License
 
-MIT @ Developed by [Webscope.io](https://webscope.io)
+MIT | Developed by [Webscope.io](https://webscope.io)

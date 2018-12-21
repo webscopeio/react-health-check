@@ -21,7 +21,7 @@ export default class App extends Component {
         />
         <ReactDetectOfflineAPI
           apiUrl={this.state.url}
-          checkInterval={null}
+          checkInterval={1000}
           onOnline={() => {
             console.log('Online')
           }}
