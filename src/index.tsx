@@ -10,6 +10,11 @@ export type Props = {
   checkInterval: number | null,
   onOnline?: Function,
   onOffline?: Function,
+  initialStatusCallback?: (status :boolean) => void,
+}
+
+type State = {
+  online: boolean | null,
 }
 
 function timeout(ms: number, promise: Promise<any>) {
@@ -21,7 +26,7 @@ function timeout(ms: number, promise: Promise<any>) {
   })
 }
 
-export default class ReactDetectOfflineAPI extends React.Component<Props> {
+export default class ReactDetectOfflineAPI extends React.Component<Props, State> {
 
   private interval: any;
 
@@ -35,16 +40,28 @@ export default class ReactDetectOfflineAPI extends React.Component<Props> {
     } = this.props;
 
     timeout(3000, fetch(apiUrl).then(() => {
-      this.setState({online: true}, () => {
-        if(this.props.onOnline) {
+      this.setState(({online}) => {
+        if (this.props.onOnline && online === false) {
           this.props.onOnline()
         }
+
+        if (this.props.initialStatusCallback && online === null) {
+          this.props.initialStatusCallback(true)
+        }
+
+        return {online: true}
       })
     })).catch(() => {
-      this.setState({online: false}, () => {
-        if(this.props.onOffline) {
+      this.setState(({online}) => {
+        if (this.props.onOffline && online === true) {
           this.props.onOffline()
         }
+
+        if (this.props.initialStatusCallback && online === null) {
+          this.props.initialStatusCallback(false)
+        }
+
+        return {online: false}
       })
     })
   };

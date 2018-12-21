@@ -1,6 +1,6 @@
 {
   "name": "react-detect-offline-api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Detect whether your API is online of offline",
   "author": "jvorcak",
   "license": "MIT",
