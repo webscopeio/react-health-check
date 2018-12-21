@@ -6,10 +6,10 @@ import * as React from 'react'
 
 export type Props = {
   apiUrl: string,
-  render: Function,
+  render?: Function,
   checkInterval: number | null,
-  onOnline: Function,
-  onOffline: Function,
+  onOnline?: Function,
+  onOffline?: Function,
 }
 
 function timeout(ms: number, promise: Promise<any>) {
@@ -36,11 +36,15 @@ export default class ReactDetectOfflineAPI extends React.Component<Props> {
 
     timeout(3000, fetch(apiUrl).then(() => {
       this.setState({online: true}, () => {
-        this.props.onOnline()
+        if(this.props.onOnline) {
+          this.props.onOnline()
+        }
       })
     })).catch(() => {
       this.setState({online: false}, () => {
-        this.props.onOffline()
+        if(this.props.onOffline) {
+          this.props.onOffline()
+        }
       })
     })
   };
@@ -73,9 +77,11 @@ export default class ReactDetectOfflineAPI extends React.Component<Props> {
     }
 
     return (
-      <div>
-        {this.props.render(this.state)}
-      </div>
+      <React.Fragment>
+        {this.props.render && this.props.render({
+          online: this.state.online,
+        })}
+      </React.Fragment>
     )
   }
 }
