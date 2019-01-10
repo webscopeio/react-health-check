@@ -8,8 +8,10 @@ export type Props = {
   apiUrl: string,
   render?: Function,
   checkInterval: number | null,
+  shouldAlwaysRerender?: boolean,
   onOnline?: Function,
   onOffline?: Function,
+  responseCallback?: Function,
   initialStatusCallback?: (status :boolean) => void,
 }
 
@@ -39,32 +41,51 @@ export default class ReactDetectOfflineAPI extends React.Component<Props, State>
       apiUrl,
     } = this.props;
 
-    timeout(3000, fetch(apiUrl).then(() => {
-      this.setState(({online}) => {
-        if (this.props.onOnline && online === false) {
-          this.props.onOnline()
-        }
+    timeout(3000, fetch(apiUrl)
+      .then(res => res.json())
+      .then(res => {
+        this.setState(({online}) => {
+          const currentStatus = this.props.responseCallback ? this.props.responseCallback(res) : {}
+          if (this.props.onOnline && online === false) {
+            !currentStatus.online ? null : this.props.onOnline()
+          }
 
-        if (this.props.initialStatusCallback && online === null) {
-          this.props.initialStatusCallback(true)
-        }
+          if (this.props.onOffline && online === true && currentStatus.online === false) {
+            this.props.onOffline()
+          }
 
-        return {online: true}
+          if (this.props.initialStatusCallback && online === null) {
+            this.props.initialStatusCallback(true)
+          }
+
+          if (this.props.responseCallback) {
+            return { online: currentStatus.online }
+          }
+
+          return { online: true }
+        })
+      }))
+      .catch(() => {
+        this.setState(({online}) => {
+          if (this.props.onOffline && online === true) {
+            this.props.onOffline()
+          }
+
+          if (this.props.initialStatusCallback && online === null) {
+            this.props.initialStatusCallback(false)
+          }
+
+          return {online: false}
+        })
       })
-    })).catch(() => {
-      this.setState(({online}) => {
-        if (this.props.onOffline && online === true) {
-          this.props.onOffline()
-        }
-
-        if (this.props.initialStatusCallback && online === null) {
-          this.props.initialStatusCallback(false)
-        }
-
-        return {online: false}
-      })
-    })
   };
+
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    const shouldBeRerendered = nextProps.shouldAlwaysRerender
+      || this.state.online === null
+      || nextState.online === true
+    return shouldBeRerendered
+  }
 
   componentDidUpdate(prevProps: Readonly<Props>): void {
     if (prevProps.apiUrl !== this.props.apiUrl) {
