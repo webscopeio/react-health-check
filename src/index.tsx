@@ -8,7 +8,6 @@ export type Props = {
   apiUrl: string,
   render?: Function,
   checkInterval: number | null,
-  shouldAlwaysRerender?: boolean,
   onOnline?: Function,
   onOffline?: Function,
   resolveOnlineStatusFromPromise?: (response: Object) => boolean,
