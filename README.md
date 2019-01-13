@@ -24,12 +24,13 @@ class Example extends React.Component {
         onOnline={() => {
           console.log('Online')
         }}
-        onOffline={() => {
-          console.log('Offline')
+        onOffline={error => {
+          console.log(error && error.status ? 'Offline with error:' + error.status : 'Offline')
         }}
         initialStatusCallback={status => {
           console.log('Initial status ', status ? 'online' : 'offline')
         }}
+        resolveOnlineStatusFromPromise={response => response.status === 'healthy'}
         render={({ online }) =>
           online
             ?
@@ -50,7 +51,8 @@ Please note that if a request is blocked by CORS policy, this component will not
 | checkInterval | true | number &#124; null | Polling interval. If null, there will be only one check on `componentDidMount` |
 | render | false | Function | We're using [Render Props](https://reactjs.org/docs/render-props.html) to render online of offline component. See an example for more info. |
 | onOnline | false | Function | Called once an API becomes online and was offline |
-| onOffline | false | Function | Called once an API becomes offline and was online |
+| onOffline | false | Function | Called once an API becomes offline and was online, in case API call was unsuccessful, it gets error as parameter|
+| resolveOnlineStatusFromPromise | false | (response: Object) => boolean | Called to detect online status from response after successful API call, otherwise every successful API call would be considered as online status |
 | initialStatusCallback | false | (status: boolean) => void | Calledback that returnes an initial status |
    
 ## License
