@@ -67,7 +67,7 @@ export default class ReactDetectOfflineAPI extends React.Component<Props, State>
           }
 
           if (this.props.initialStatusCallback && online === null) {
-            this.props.initialStatusCallback(true)
+            this.props.initialStatusCallback(isOnlineNow)
           }
 
           return { online: isOnlineNow }
