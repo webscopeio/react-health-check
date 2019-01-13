@@ -11,7 +11,7 @@ export type Props = {
   shouldAlwaysRerender?: boolean,
   onOnline?: Function,
   onOffline?: Function,
-  responseCallback?: Function,
+  resolveOnlineStatusFromPromise?: (response: Object) => boolean,
   initialStatusCallback?: (status :boolean) => void,
 }
 
@@ -28,6 +28,13 @@ function timeout(ms: number, promise: Promise<any>) {
   })
 }
 
+function handleErrors(response: any) {
+  if (!response.ok) {
+      throw response;
+  }
+  return response;
+}
+
 export default class ReactDetectOfflineAPI extends React.Component<Props, State> {
 
   private interval: any;
@@ -42,15 +49,21 @@ export default class ReactDetectOfflineAPI extends React.Component<Props, State>
     } = this.props;
 
     timeout(3000, fetch(apiUrl)
+      .then(handleErrors)
       .then(res => res.json())
-      .then(res => {
+      .then(res => new Promise((resolve) => {
+        const isOnlineNow = this.props.resolveOnlineStatusFromPromise 
+          ? this.props.resolveOnlineStatusFromPromise(res)
+          : true
+        resolve({isOnlineNow})
+      }))
+      .then(({isOnlineNow}) => {
         this.setState(({online}) => {
-          const currentStatus = this.props.responseCallback ? this.props.responseCallback(res) : {}
-          if (this.props.onOnline && online === false) {
-            !currentStatus.online ? null : this.props.onOnline()
+          if (this.props.onOnline && online === false && isOnlineNow) {
+            this.props.onOnline()
           }
 
-          if (this.props.onOffline && online === true && currentStatus.online === false) {
+          if (this.props.onOffline && online === true && !isOnlineNow) {
             this.props.onOffline()
           }
 
@@ -58,17 +71,13 @@ export default class ReactDetectOfflineAPI extends React.Component<Props, State>
             this.props.initialStatusCallback(true)
           }
 
-          if (this.props.responseCallback) {
-            return { online: currentStatus.online }
-          }
-
-          return { online: true }
+          return { online: isOnlineNow }
         })
       }))
-      .catch(() => {
+      .catch((err) => {
         this.setState(({online}) => {
           if (this.props.onOffline && online === true) {
-            this.props.onOffline()
+            this.props.onOffline(err)
           }
 
           if (this.props.initialStatusCallback && online === null) {
@@ -79,13 +88,6 @@ export default class ReactDetectOfflineAPI extends React.Component<Props, State>
         })
       })
   };
-
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
-    const shouldBeRerendered = nextProps.shouldAlwaysRerender
-      || this.state.online === null
-      || nextState.online === true
-    return shouldBeRerendered
-  }
 
   componentDidUpdate(prevProps: Readonly<Props>): void {
     if (prevProps.apiUrl !== this.props.apiUrl) {
