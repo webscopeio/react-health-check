@@ -10,7 +10,7 @@ export type Props = {
   checkInterval: number | null,
   onOnline?: Function,
   onOffline?: Function,
-  resolveOnlineStatusFromPromise?: (response: Object) => boolean,
+  resolveOnlineStatusFromPromise?: (response: Promise<any>) => boolean,
   initialStatusCallback?: (status :boolean) => void,
 }
 
@@ -36,6 +36,10 @@ function handleErrors(response: any) {
 
 export default class ReactDetectOfflineAPI extends React.Component<Props, State> {
 
+  static defaultProps = {
+    resolveOnlineStatusFromPromise: async () => true,
+  }
+
   private interval: any;
 
   state = {
@@ -49,14 +53,8 @@ export default class ReactDetectOfflineAPI extends React.Component<Props, State>
 
     timeout(3000, fetch(apiUrl)
       .then(handleErrors)
-      .then(res => res.json())
-      .then(res => new Promise((resolve) => {
-        const isOnlineNow = this.props.resolveOnlineStatusFromPromise 
-          ? this.props.resolveOnlineStatusFromPromise(res)
-          : true
-        resolve({isOnlineNow})
-      }))
-      .then(({isOnlineNow}) => {
+      .then(this.props.resolveOnlineStatusFromPromise)
+      .then(isOnlineNow => {
         this.setState(({online}) => {
           if (this.props.onOnline && online === false && isOnlineNow) {
             this.props.onOnline()
@@ -73,7 +71,7 @@ export default class ReactDetectOfflineAPI extends React.Component<Props, State>
           return { online: isOnlineNow }
         })
       }))
-      .catch((err) => {
+      .catch(err => {
         this.setState(({online}) => {
           if (this.props.onOffline && online === true) {
             this.props.onOffline(err)
