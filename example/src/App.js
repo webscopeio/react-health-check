@@ -28,8 +28,8 @@ export default class App extends Component {
           onOnline={() => {
             console.log('Online')
           }}
-          onOffline={() => {
-            console.log('Offline')
+          onOffline={error => {
+            console.log(error && error.status ? 'Offline with error:' + error.status : 'Offline')
           }}
           render={({ online }) =>
             online
