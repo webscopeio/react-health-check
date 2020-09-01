@@ -28,7 +28,7 @@
     "react-dom": "^15.0.0 || ^16.0.0"
   },
   "devDependencies": {
-    "@svgr/rollup": "^2.4.1",
+    "@svgr/rollup": "^5.4.0",
     "@types/jest": "^23.1.5",
     "@types/react": "^16.3.13",
     "@types/react-dom": "^16.0.5",
