@@ -1,55 +1,81 @@
 {
-  "name": "react-detect-offline-api",
-  "version": "1.0.3",
-  "description": "Detect whether your API is online of offline",
-  "author": "jvorcak",
-  "license": "MIT",
-  "repository": "webscopeio/react-detect-offline-api",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "jsnext:main": "dist/index.es.js",
-  "engines": {
-    "node": ">=8",
-    "npm": ">=5"
-  },
+  "name": "@webscopeio/react-health-check",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "cross-env CI=1 react-scripts-ts test --env=jsdom",
-    "test:watch": "react-scripts-ts test --env=jsdom",
     "build": "rollup -c",
     "start": "rollup -c -w",
-    "prepare": "npm run build",
-    "predeploy": "cd example && npm install && npm run build",
-    "deploy": "gh-pages -d example/build"
+    "test": "jest",
+    "types:check": "tsc --noEmit",
+    "format": "prettier --write \"{src,test,examples}/**/*.{ts,tsx}\"",
+    "lint": "eslint \"{src,test,examples}/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"{src,test,examples}/**/*.{ts,tsx}\" --fix"
   },
-  "dependencies": {},
-  "peerDependencies": {
-    "prop-types": "^15.5.4",
-    "react": "^15.0.0 || ^16.0.0",
-    "react-dom": "^15.0.0 || ^16.0.0"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webscopeio/react-detect-offline-api.git"
+  },
+  "author": "Jozef Hruška <hruska@webscope.io>",
+  "contributors": [
+    "Ján Vorčák <vorcak@webscope.io>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "react",
+    "health",
+    "check",
+    "hook",
+    "detect",
+    "offline",
+    "api"
+  ],
+  "bugs": {
+    "url": "https://github.com/webscopeio/react-detect-offline-api/issues"
+  },
+  "homepage": "https://github.com/webscopeio/react-detect-offline-api#readme",
+  "dependencies": {
+    "redaxios": "~0.3.0"
   },
   "devDependencies": {
-    "@svgr/rollup": "^2.4.1",
-    "@types/jest": "^23.1.5",
-    "@types/react": "^16.3.13",
-    "@types/react-dom": "^16.0.5",
-    "babel-core": "^6.26.3",
-    "babel-runtime": "^6.26.0",
-    "cross-env": "^5.1.4",
-    "gh-pages": "^1.2.0",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-scripts-ts": "^2.16.0",
-    "rollup": "^0.62.0",
-    "rollup-plugin-babel": "^3.0.7",
-    "rollup-plugin-commonjs": "^9.1.3",
-    "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-peer-deps-external": "^2.2.0",
-    "rollup-plugin-postcss": "^1.6.2",
-    "rollup-plugin-typescript2": "^0.17.0",
-    "rollup-plugin-url": "^1.4.0",
-    "typescript": "^2.8.3"
+    "@rollup/plugin-typescript": "~5.0.2",
+    "@types/jest": "~26.0.12",
+    "@types/node": "~14.6.0",
+    "@types/react": "~16.9.48",
+    "@typescript-eslint/eslint-plugin": "~3.10.1",
+    "@typescript-eslint/parser": "~3.10.1",
+    "eslint": "~7.7.0",
+    "eslint-config-prettier": "~6.11.0",
+    "eslint-plugin-import": "~2.22.0",
+    "eslint-plugin-prettier": "~3.1.4",
+    "eslint-plugin-react": "~7.20.6",
+    "eslint-plugin-react-hooks": "~4.1.0",
+    "husky": "~4.2.5",
+    "jest": "~26.4.2",
+    "jest-fetch-mock": "~3.0.3",
+    "lint-staged": "~10.2.13",
+    "prettier": "~2.1.1",
+    "react": "~16.8.0",
+    "react-dom": "~16.8.0",
+    "rollup": "~2.26.6",
+    "rollup-plugin-terser": "~7.0.0",
+    "rollup-plugin-typescript2": "~0.27.2",
+    "ts-jest": "~26.3.0",
+    "typescript": "~4.0.2"
   },
-  "files": [
-    "dist"
-  ]
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "npm run lint:fix",
+      "npm run format"
+    ]
+  }
 }
