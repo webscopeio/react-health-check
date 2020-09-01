@@ -1,7 +1,7 @@
 {
   "name": "@webscopeio/react-health-check",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Lightweight React hook for health checking of API services.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webscopeio/react-detect-offline-api.git"
+    "url": "git+https://github.com/webscopeio/react-health-check.git"
   },
   "author": "Jozef Hruška <hruska@webscope.io>",
   "contributors": [
@@ -32,9 +32,9 @@
     "api"
   ],
   "bugs": {
-    "url": "https://github.com/webscopeio/react-detect-offline-api/issues"
+    "url": "https://github.com/webscopeio/react-health-check/issues"
   },
-  "homepage": "https://github.com/webscopeio/react-detect-offline-api#readme",
+  "homepage": "https://github.com/webscopeio/react-health-check#readme",
   "dependencies": {
     "redaxios": "~0.3.0"
   },
