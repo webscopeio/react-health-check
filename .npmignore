@@ -1,0 +1,9 @@
+tests
+node_modules
+dist
+.vscode
+*.log
+*.tgz
+.env
+.next
+.DS_Store
