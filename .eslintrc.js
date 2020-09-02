@@ -6,7 +6,7 @@ module.exports = {
     },
     ecmaVersion: 11,
     sourceType: 'module',
-    project: './tsconfig.json',
+    project: './tsconfig.eslint.json',
   },
   env: {
     es6: true,
