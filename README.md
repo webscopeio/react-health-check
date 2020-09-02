@@ -24,36 +24,61 @@ yarn add @webscopeio/react-health-check
 ## Usage ❓
 
 ```ts
-const { states } = useHealthCheck({
-  services: [
-    {
-      name: 'auth',
-      url: 'https://example.com/auth/health',
-    },
-    {
-      name: 'payment',
-      url: 'https://example.com/payment/health',
-    },
-  ],
-  onSuccess: (states) => {
-    console.log('All API services are available 🎉');
+const { available } = useHealthCheck({
+  service: {
+    name: 'auth',
+    url: 'https://example.com/auth/health',
   },
-  onError: (states) => {
-    console.log('At least one API service is down 😔');
+  onSuccess: ({ service, since }) => {
+    console.log(`Service "${service.name}" is available since "${since}" 🎉`);
+  },
+  onError: ({ service, since }) => {
+    console.log(`Service "${service.name}" is not available since "${since}" 😔`);
   },
 });
+```
+
+You can also create a global configuration so you don't have to define services and callbacks every time:
+
+```tsx
+// App wrapper
+<HealthCheckConfig
+  value={{
+    services: [
+      {
+        name: 'auth',
+        url: 'https://example.com/auth/health',
+      },
+      {
+        name: 'payment',
+        url: 'https://example.com/payment/health',
+      },
+    ],
+    onSuccess: ({ service, since }) => {
+      console.log(`Service "${service.name}" is available since "${since}" 🎉`);
+    },
+    onError: ({ service, since }) => {
+      console.log(`Service "${service.name}" is not available since "${since}" 😔`);
+    },
+  }}
+>
+  <App />
+</HealthCheckConfig>;
+
+// Later in some child component
+const { available } = useHealthCheck('auth');
 ```
 
 ## Configuration 🛠
 
 `useHealthCheck()` hook accepts a configuration object with keys:
 
-| Key             | Type                                       | Description                                                                      |
-| --------------- | ------------------------------------------ | -------------------------------------------------------------------------------- |
-| services        | `HealthCheckService<S = string>`           | Array defining all API services that should be checked.                          |
-| onSuccess       | `(states: HealthCheckState<S>[]) => void;` | Callback called when all API services are available.                             |
-| onError         | `(states: HealthCheckState<S>[]) => void;` | Callback called when at least one API service is down.                           |
-| refreshInterval | `number`                                   | Polling interval for health checks in milliseconds. <br> **Default value: 3000** |
+| Key             | Type                                | Description                                                                      |
+| --------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
+| service         | `Service<S = string>`               | Object defining an API service to be checked.                                    |
+| onSuccess       | `(state: ServiceState<S>) => void;` | Callback which should be called when API service becomes available again.        |
+| onError         | `(state: ServiceState<S>) => void;` | Callback which should be called when API service becomes unavailable.            |  |
+| refreshInterval | `number`                            | Polling interval for health checks in milliseconds. <br> **Default value: 5000** |
 
 ## License
 
