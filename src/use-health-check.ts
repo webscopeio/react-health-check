@@ -1,77 +1,73 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
+import HealthCheckConfig from './config';
 
-import {
-  HealthCheckConfig,
-  ServiceHealthCheckResult,
-  HealthCheckState,
-  HealthCheckReturn,
-} from './types';
-import { checkServiceHealth, updateServiceState } from './helpers';
+import { checkServiceHealth, extractServiceConfig, updateServiceState } from './helpers';
+import { LocalConfigInterface, ServiceState } from './types';
 
 /* useHealthCheck
 ============================================================================= */
-const useHealthCheck = <S = string>(config: HealthCheckConfig<S>): HealthCheckReturn<S> => {
-  const [services] = useState<HealthCheckConfig<S>['services']>(config?.services);
-  const [states, setStates] = useState<HealthCheckState<S>[]>(
-    config?.services.map((service) => ({
-      service,
-      available: true,
-      since: Date.now(),
-      last: null,
-    })),
-  );
+function useHealthCheck<S = string>(
+  serviceName: S,
+  localConfig: Omit<LocalConfigInterface, 'service'>,
+): ServiceState;
+function useHealthCheck<S = string>(localConfig: LocalConfigInterface<S>): ServiceState;
 
-  const checkServices = useCallback(() => {
-    return setInterval(() => {
-      const requests: Promise<ServiceHealthCheckResult<S>>[] = [];
+function useHealthCheck<S = string>(
+  ...args: Array<S | LocalConfigInterface | Omit<LocalConfigInterface, 'service'>>
+): ServiceState {
+  const serviceName = typeof args[0] === 'string' ? args[0] : null;
+  const localConfig =
+    typeof args[0] === 'string'
+      ? (args[1] as Omit<LocalConfigInterface, 'service'>)
+      : (args[0] as LocalConfigInterface);
 
-      services.forEach((service) => requests.push(checkServiceHealth<S>(service)));
+  const globalConfig = useContext(HealthCheckConfig);
+  const [state, setState] = useState<ServiceState>({
+    service: extractServiceConfig(serviceName, localConfig, globalConfig),
+    available: true,
+    since: Date.now(),
+    last: null,
+  });
 
-      Promise.all(requests)
-        .then((results) => {
-          setStates((prevStates) => {
-            const nextStates = results.map((result) =>
-              updateServiceState<S>(
-                prevStates.find((state) => state.service.name === result.service.name),
-                result,
-              ),
-            );
+  const checkService = useCallback(() => {
+    return setInterval(async () => {
+      const checkResult = await checkServiceHealth(state?.service);
 
-            return nextStates;
-          });
-        })
-        .catch(() => {
-          typeof config?.onError === 'function' && config.onError(states);
-        });
-    }, config?.refreshInterval ?? 3000);
-  }, [config, services, states]);
+      setState((prevState) => ({
+        ...updateServiceState(prevState, checkResult),
+        service: extractServiceConfig(serviceName, localConfig, globalConfig),
+      }));
+    }, localConfig?.refreshInterval ?? globalConfig?.refreshInterval ?? 5000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceName, localConfig, globalConfig]);
 
   useEffect(() => {
-    const intervalId = checkServices();
+    const intervalId = checkService();
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [checkServices]);
+  }, [checkService]);
 
   useEffect(() => {
-    const changedStates = states.filter((state) => state.since === state.last);
-
-    if (!changedStates.length) {
+    if (state.since !== state.last) {
       return;
     }
 
-    if (states.every((state) => state.available)) {
-      typeof config.onSuccess === 'function' && config.onSuccess(states);
+    if (state.available) {
+      typeof localConfig.onSuccess === 'function'
+        ? localConfig.onSuccess(state)
+        : globalConfig.onSuccess(state);
+
       return;
+    } else {
+      typeof localConfig?.onError === 'function'
+        ? localConfig.onError(state)
+        : globalConfig.onError(state);
     }
+  }, [localConfig, globalConfig, state]);
 
-    if (states.some((state) => !state.available)) {
-      typeof config?.onError === 'function' && config.onError(states);
-    }
-  }, [config, states]);
-
-  return { states };
-};
+  return { ...state };
+}
 
 export default useHealthCheck;

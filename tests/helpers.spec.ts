@@ -1,9 +1,20 @@
 import { enableFetchMocks } from 'jest-fetch-mock';
 
-import { checkServiceHealth, updateServiceState } from '../src/helpers';
-import { HealthCheckService, ServiceHealthCheckResult, HealthCheckState } from '../src/types';
+import { checkServiceHealth, extractServiceConfig, updateServiceState } from '../src/helpers';
+import { Service, ServiceHealthCheckResult, ServiceState } from '../src/types';
 
 describe('Helpers', () => {
+  const MOCK_SERVICES: Service[] = [
+    {
+      name: 'auth',
+      url: 'https://example.com/auth/health',
+    },
+    {
+      name: 'payment',
+      url: 'https://example.com/payment/health',
+    },
+  ];
+
   enableFetchMocks();
   const RealDate = Date;
 
@@ -15,17 +26,6 @@ describe('Helpers', () => {
     global.Date = RealDate;
   });
 
-  const MOCK_SERVICES: HealthCheckService[] = [
-    {
-      name: 'auth',
-      url: 'https://example.com/auth/health',
-    },
-    {
-      name: 'payment',
-      url: 'https://example.com/payment/health',
-    },
-  ];
-
   describe('checkServiceHealth', () => {
     beforeEach(() => {
       fetchMock.resetMocks();
@@ -36,7 +36,7 @@ describe('Helpers', () => {
 
       expect(fetchMock.mock.calls).toHaveLength(1);
       expect(fetchMock.mock.calls[0][0]).toEqual(MOCK_SERVICES[0].url);
-      expect(fetchMock.mock.calls[0][1].method).toEqual('get');
+      expect(fetchMock.mock.calls[0][1].method).toEqual('GET');
     });
 
     it('Returns a correct result for a successful request.', async () => {
@@ -72,7 +72,7 @@ describe('Helpers', () => {
 
   describe('updateServiceState', () => {
     it('Updates service state correctly.', () => {
-      const PREV_STATE: HealthCheckState = {
+      const PREV_STATE: ServiceState = {
         service: MOCK_SERVICES[0],
         available: true,
         since: null,
@@ -85,7 +85,7 @@ describe('Helpers', () => {
         timestamp: Date.now(),
       };
 
-      const NEXT_STATE: HealthCheckState = {
+      const NEXT_STATE: ServiceState = {
         service: MOCK_SERVICES[0],
         available: false,
         since: Date.now(),
@@ -109,6 +109,41 @@ describe('Helpers', () => {
         since: Date.now() - 1,
         last: Date.now(),
       });
+    });
+  });
+
+  describe('extractServiceConfig', () => {
+    it('Extracts service config correctly.', () => {
+      expect(
+        extractServiceConfig(MOCK_SERVICES[0].name, undefined, {
+          services: [MOCK_SERVICES[0], MOCK_SERVICES[1]],
+        }),
+      ).toEqual(MOCK_SERVICES[0]);
+
+      expect(
+        extractServiceConfig(
+          MOCK_SERVICES[0].name,
+          {
+            refreshInterval: 3000,
+          },
+          {
+            services: [MOCK_SERVICES[0], MOCK_SERVICES[1]],
+          },
+        ),
+      ).toEqual(MOCK_SERVICES[0]);
+
+      expect(
+        extractServiceConfig(
+          null,
+          {
+            service: MOCK_SERVICES[1],
+            refreshInterval: 3000,
+          },
+          {
+            services: [MOCK_SERVICES[0], MOCK_SERVICES[1]],
+          },
+        ),
+      ).toEqual(MOCK_SERVICES[1]);
     });
   });
 });
