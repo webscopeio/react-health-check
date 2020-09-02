@@ -12,7 +12,7 @@ Lightweight React hook for health checking of API services.
 ## Installation 🧑‍🔧
 
 ```
-npm i --save-dev @webscopeio/react-health-check
+npm i @webscopeio/react-health-check
 ```
 
 or
@@ -80,6 +80,6 @@ const { available } = useHealthCheck('auth');
 | onError         | `(state: ServiceState<S>) => void;` | Callback which should be called when API service becomes unavailable.            |  |
 | refreshInterval | `number`                            | Polling interval for health checks in milliseconds. <br> **Default value: 5000** |
 
-## License
+## License 💼
 
 MIT | Developed by Webscope.io
