@@ -1,3 +1,12 @@
-node_modules/*
-dist/*
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# misc
 .vscode
+.DS_Store
+*.pem
+
+# build
+dist
