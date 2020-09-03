@@ -6,9 +6,10 @@ import { LocalConfigInterface, ServiceState } from './types';
 
 /* useHealthCheck
 ============================================================================= */
+function useHealthCheck<S = string>(serviceName: S): ServiceState;
 function useHealthCheck<S = string>(
   serviceName: S,
-  localConfig: Omit<LocalConfigInterface, 'service'>,
+  localConfig?: Omit<LocalConfigInterface, 'service'>,
 ): ServiceState;
 function useHealthCheck<S = string>(localConfig: LocalConfigInterface<S>): ServiceState;
 
