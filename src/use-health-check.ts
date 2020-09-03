@@ -55,7 +55,7 @@ function useHealthCheck<S = string>(
     }
 
     if (state.available) {
-      typeof localConfig.onSuccess === 'function'
+      typeof localConfig?.onSuccess === 'function'
         ? localConfig.onSuccess(state)
         : globalConfig.onSuccess(state);
 
