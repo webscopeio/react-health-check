@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  background-color: #fafafa;
+  font-family: 'Roboto', sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+}
+
+.health-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+
+  .availability {
+    font-size: 2rem;
+    font-weight: bold;
+    color: red;
+
+    &.is-available {
+      color: green;
+    }
+  }
+}
+
+p {
+  margin: 0 0 0.5rem;
+}
+
+.author {
+  margin-top: 5rem;
+}

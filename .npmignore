@@ -1,4 +1,5 @@
 tests
+examples
 node_modules
 dist
 .vscode
