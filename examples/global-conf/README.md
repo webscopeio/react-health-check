@@ -1,4 +1,4 @@
-# Example - Basic
+# Example - Global configuration
 
 This example demonstrates the use of `@webscopeio/react-health-check` package with global configuration.
 
