@@ -1,30 +1,7 @@
 import { useHealthCheck } from '@webscopeio/react-health-check';
-import { toast } from 'react-toastify';
 
 export default function Home() {
-  const { available } = useHealthCheck({
-    service: {
-      name: 'auth',
-      url: '/api/health',
-    },
-    onSuccess: ({ service, since }) => {
-      toast.success(
-        <>
-          Service <strong>"{service.name}"</strong> is available since: <br />{' '}
-          {Date(since).toString()} 🎉
-        </>,
-      );
-    },
-    onError: ({ service, since }) => {
-      toast.error(
-        <>
-          Service <strong>"{service.name}"</strong> is not available since: <br />{' '}
-          {Date(since).toString()} 😔
-        </>,
-      );
-    },
-    refreshInterval: 2000,
-  });
+  const { available } = useHealthCheck('auth');
 
   return (
     <div className="container">
