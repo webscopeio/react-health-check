@@ -21,6 +21,11 @@ or
 yarn add @webscopeio/react-health-check
 ```
 
+## Examples 😲
+
+- [Basic](examples/basic)
+- [Global configuration](examples/global-conf)
+
 ## Usage ❓
 
 ```ts
