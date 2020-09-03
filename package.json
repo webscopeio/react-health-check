@@ -1,6 +1,6 @@
 {
   "name": "@webscopeio/react-health-check",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Lightweight React hook for checking health of API services.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

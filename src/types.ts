@@ -5,7 +5,7 @@ export interface CommonConfigInterface<S = string> {
 }
 
 export interface GlobalConfigInterface<S = string> extends CommonConfigInterface<S> {
-  services?: [Service<S>, ...Service<S>[]];
+  services?: Service<S>[];
 }
 
 export interface LocalConfigInterface<S = string> extends CommonConfigInterface<S> {
