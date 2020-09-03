@@ -1,6 +1,6 @@
 # React Health Check 🏥
 
-Lightweight React hook for health checking of API services.
+Lightweight React hook for checking health of API services.
 
 [![stable](https://badgen.net/npm/v/@webscopeio/react-health-check)](https://www.npmjs.com/package/@webscopeio/react-health-check)
 ![tslib](https://badgen.net/npm/types/tslib)
