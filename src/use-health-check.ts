@@ -2,20 +2,20 @@ import { useState, useEffect, useCallback, useContext } from 'react';
 import HealthCheckConfig from './config';
 
 import { checkServiceHealth, extractServiceConfig, updateServiceState } from './helpers';
-import { LocalConfigInterface, ServiceState } from './types';
+import { LocalConfigInterface, ServiceHealthCheckReturn, ServiceState } from './types';
 
 /* useHealthCheck
 ============================================================================= */
-function useHealthCheck<S = string>(serviceName: S): ServiceState;
+function useHealthCheck<S = string>(serviceName: S): ServiceHealthCheckReturn;
 function useHealthCheck<S = string>(
   serviceName: S,
   localConfig?: Omit<LocalConfigInterface, 'service'>,
-): ServiceState;
-function useHealthCheck<S = string>(localConfig: LocalConfigInterface<S>): ServiceState;
+): ServiceHealthCheckReturn;
+function useHealthCheck<S = string>(localConfig: LocalConfigInterface<S>): ServiceHealthCheckReturn;
 
 function useHealthCheck<S = string>(
   ...args: Array<S | LocalConfigInterface | Omit<LocalConfigInterface, 'service'>>
-): ServiceState {
+): ServiceHealthCheckReturn {
   const serviceName = typeof args[0] === 'string' ? args[0] : null;
   const localConfig =
     typeof args[0] === 'string'
@@ -30,25 +30,33 @@ function useHealthCheck<S = string>(
     last: null,
   });
 
-  const checkService = useCallback(() => {
-    return setInterval(async () => {
+  const startCheckingInterval = useCallback(() => {
+    return setInterval(() => {
+      checkService(serviceName, localConfig, globalConfig);
+    }, localConfig?.refreshInterval ?? globalConfig?.refreshInterval ?? 5000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceName, localConfig, globalConfig]);
+
+  const checkService = useCallback(
+    async (serviceName, localConfig, globalConfig) => {
       const checkResult = await checkServiceHealth(state?.service);
 
       setState((prevState) => ({
         ...updateServiceState(prevState, checkResult),
         service: extractServiceConfig(serviceName, localConfig, globalConfig),
       }));
-    }, localConfig?.refreshInterval ?? globalConfig?.refreshInterval ?? 5000);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceName, localConfig, globalConfig]);
+    [startCheckingInterval],
+  );
 
   useEffect(() => {
-    const intervalId = checkService();
+    const intervalId = startCheckingInterval();
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [checkService]);
+  }, [startCheckingInterval]);
 
   useEffect(() => {
     if (state.since !== state.last) {
@@ -68,7 +76,12 @@ function useHealthCheck<S = string>(
     }
   }, [localConfig, globalConfig, state]);
 
-  return { ...state };
+  return {
+    ...state,
+    refresh: async () => {
+      await checkService(serviceName, localConfig, globalConfig);
+    },
+  };
 }
 
 export default useHealthCheck;
