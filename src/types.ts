@@ -29,3 +29,7 @@ export type ServiceHealthCheckResult = {
   available: boolean;
   timestamp: number;
 };
+
+export type ServiceHealthCheckReturn = {
+  refresh: () => Promise<void>;
+} & ServiceState;
