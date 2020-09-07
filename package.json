@@ -11,7 +11,10 @@
     "types:check": "tsc --noEmit",
     "format": "prettier --write \"{src,tests,examples}/**/*.{ts,tsx}\"",
     "lint": "eslint \"{src,tests,examples}/**/*.{ts,tsx}\"",
-    "lint:fix": "eslint \"{src,tests,examples}/**/*.{ts,tsx}\" --fix"
+    "lint:fix": "eslint \"{src,tests,examples}/**/*.{ts,tsx}\" --fix",
+    "preversion": "npm test",
+    "version": "npm run build",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
