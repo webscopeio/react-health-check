@@ -78,12 +78,15 @@ const { available } = useHealthCheck('auth');
 
 `useHealthCheck()` hook accepts a configuration object with keys:
 
-| Key             | Type                                | Description                                                                      |
-| --------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
-| service         | `Service<S = string>`               | Object defining an API service to be checked.                                    |
-| onSuccess       | `(state: ServiceState<S>) => void;` | Callback which should be called when API service becomes available again.        |
-| onError         | `(state: ServiceState<S>) => void;` | Callback which should be called when API service becomes unavailable.            |  |
-| refreshInterval | `number`                            | Polling interval for health checks in milliseconds. <br> **Default value: 5000** |
+| Key                | Type                                | Description                                                                                                   |
+| ------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| service            | `Service<S = string>`               | Object defining an API service to be checked.                                                                 |
+| onSuccess          | `(state: ServiceState<S>) => void;` | Callback which should be called when API service becomes available again.                                     |
+| onError            | `(state: ServiceState<S>) => void;` | Callback which should be called when API service becomes unavailable.                                         |  |
+| refreshInterval    | `number`                            | Polling interval for health checks in milliseconds. <br> **Default value: 5000**                              |
+| refreshWhileHidden | `boolean`                           | Determines whether polling should be paused while browser window isn't visible. <br> **Default value: false** |
+
+Global configuration accepts the same keys as `useHealthCheck()` hook with the exception of "service". You need to specify array of "services" when using global configuration.
 
 ## License 💼
 
