@@ -1,9 +1,21 @@
-tests
-examples
-node_modules
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# misc
 .vscode
-*.log
-*.tgz
-.env
-.next
 .DS_Store
+*.pem
+.github
+
+# dev
+/tests
+/examples
+/src
+.prettierrc
+.eslintrc.js
+rollup.config.js
+tsconfig.eslint.json
+tsconfig.json
+jest.config.js
