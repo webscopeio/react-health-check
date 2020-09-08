@@ -1,7 +1,8 @@
 export interface CommonConfigInterface<S = string> {
-  refreshInterval?: number;
   onSuccess?: (state: ServiceState<S>) => void;
   onError?: (state: ServiceState<S>) => void;
+  refreshInterval?: number;
+  refreshWhileHidden?: boolean;
 }
 
 export interface GlobalConfigInterface<S = string> extends CommonConfigInterface<S> {
