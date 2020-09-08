@@ -14,7 +14,8 @@
     "lint:fix": "eslint \"{src,tests,examples}/**/*.{ts,tsx}\" --fix",
     "preversion": "npm test",
     "version": "npm run build",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "package-size": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz"
   },
   "repository": {
     "type": "git",
