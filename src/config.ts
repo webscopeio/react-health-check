@@ -7,7 +7,6 @@ import { GlobalConfigInterface } from './types';
 const HealthCheckConfig = createContext<GlobalConfigInterface>({
   onError: () => null,
   onSuccess: () => null,
-  refreshInterval: 3000,
 });
 
 HealthCheckConfig.displayName = 'HealthCheckConfig';

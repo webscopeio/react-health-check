@@ -44,6 +44,12 @@ export const updateServiceState = (
   last: checkResult.timestamp,
 });
 
+/**
+ * Helper function to extract service from local or global config.
+ * @param serviceName Name of service (used if services are defined globally)
+ * @param localConfig Local configuration object
+ * @param globalConfig Global configuration object (context)
+ */
 export const extractServiceConfig = (
   serviceName: string,
   localConfig: LocalConfigInterface | Omit<LocalConfigInterface, 'service'>,
@@ -61,3 +67,21 @@ export const extractServiceConfig = (
 
   return service;
 };
+
+/**
+ * Helper function to merge configurations (local configuration has a higher priority).
+ * @param serviceName Name of service (used if services are defined globally)
+ * @param localConfig Local configuration object
+ * @param globalConfig Global configuration object (context)
+ */
+export const mergeConfigs = (
+  serviceName: string,
+  localConfig: LocalConfigInterface | Omit<LocalConfigInterface, 'service'> = {},
+  globalConfig: GlobalConfigInterface = {},
+): LocalConfigInterface => ({
+  service: extractServiceConfig(serviceName, localConfig, globalConfig),
+  onSuccess: localConfig.onSuccess ?? globalConfig.onSuccess,
+  onError: localConfig.onError ?? globalConfig.onError,
+  refreshInterval: localConfig.refreshInterval ?? globalConfig.refreshInterval ?? 5000,
+  refreshWhileHidden: localConfig.refreshWhileHidden ?? globalConfig.refreshWhileHidden ?? false,
+});

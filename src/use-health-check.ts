@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import HealthCheckConfig from './config';
 
-import { checkServiceHealth, extractServiceConfig, updateServiceState } from './helpers';
+import { checkServiceHealth, mergeConfigs, updateServiceState } from './helpers';
 import { LocalConfigInterface, ServiceHealthCheckReturn, ServiceState } from './types';
 
 /* useHealthCheck
@@ -23,32 +23,39 @@ function useHealthCheck<S = string>(
       : (args[0] as LocalConfigInterface);
 
   const globalConfig = useContext(HealthCheckConfig);
+
+  const config = mergeConfigs(serviceName, localConfig, globalConfig);
+
   const [state, setState] = useState<ServiceState>({
-    service: extractServiceConfig(serviceName, localConfig, globalConfig),
+    service: config.service,
     available: true,
     since: Date.now(),
     last: null,
   });
 
+  const checkService = useCallback(async (config: LocalConfigInterface) => {
+    const { service } = config;
+    const checkResult = await checkServiceHealth(service);
+
+    setState((prevState) => ({
+      ...updateServiceState(prevState, checkResult),
+      service,
+    }));
+  }, []);
+
   const startCheckingInterval = useCallback(() => {
     return setInterval(() => {
-      checkService(serviceName, localConfig, globalConfig);
-    }, localConfig?.refreshInterval ?? globalConfig?.refreshInterval ?? 5000);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceName, localConfig, globalConfig]);
+      if (
+        typeof document !== 'undefined' &&
+        document.visibilityState === 'hidden' &&
+        !config.refreshWhileHidden
+      ) {
+        return;
+      }
 
-  const checkService = useCallback(
-    async (serviceName, localConfig, globalConfig) => {
-      const checkResult = await checkServiceHealth(state?.service);
-
-      setState((prevState) => ({
-        ...updateServiceState(prevState, checkResult),
-        service: extractServiceConfig(serviceName, localConfig, globalConfig),
-      }));
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [startCheckingInterval],
-  );
+      checkService(config);
+    }, config.refreshInterval);
+  }, [config, checkService]);
 
   useEffect(() => {
     const intervalId = startCheckingInterval();
@@ -64,22 +71,18 @@ function useHealthCheck<S = string>(
     }
 
     if (state.available) {
-      typeof localConfig?.onSuccess === 'function'
-        ? localConfig.onSuccess(state)
-        : globalConfig.onSuccess(state);
+      typeof config.onSuccess === 'function' && config.onSuccess(state);
 
       return;
     } else {
-      typeof localConfig?.onError === 'function'
-        ? localConfig.onError(state)
-        : globalConfig.onError(state);
+      typeof config.onError === 'function' && config.onError(state);
     }
-  }, [localConfig, globalConfig, state]);
+  }, [config, state]);
 
   return {
     ...state,
     refresh: async () => {
-      await checkService(serviceName, localConfig, globalConfig);
+      await checkService(config);
     },
   };
 }

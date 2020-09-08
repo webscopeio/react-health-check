@@ -1,7 +1,18 @@
 import { enableFetchMocks } from 'jest-fetch-mock';
 
-import { checkServiceHealth, extractServiceConfig, updateServiceState } from '../src/helpers';
-import { Service, ServiceHealthCheckResult, ServiceState } from '../src/types';
+import {
+  checkServiceHealth,
+  extractServiceConfig,
+  mergeConfigs,
+  updateServiceState,
+} from '../src/helpers';
+import {
+  GlobalConfigInterface,
+  LocalConfigInterface,
+  Service,
+  ServiceHealthCheckResult,
+  ServiceState,
+} from '../src/types';
 
 describe('Helpers', () => {
   const MOCK_SERVICES: Service[] = [
@@ -144,6 +155,48 @@ describe('Helpers', () => {
           },
         ),
       ).toEqual(MOCK_SERVICES[1]);
+    });
+  });
+
+  describe('mergeConfigs', () => {
+    const localConfig: LocalConfigInterface = {
+      service: MOCK_SERVICES[0],
+      onSuccess: jest.fn(),
+      onError: jest.fn(),
+      refreshInterval: 1000,
+      refreshWhileHidden: true,
+    };
+
+    const globalConfig: GlobalConfigInterface = {
+      services: MOCK_SERVICES,
+      onSuccess: jest.fn(),
+      onError: jest.fn(),
+      refreshInterval: 10000,
+      refreshWhileHidden: false,
+    };
+
+    it('Merges configs correctly.', () => {
+      expect(mergeConfigs(undefined, localConfig, globalConfig)).toEqual(localConfig);
+
+      expect(
+        mergeConfigs(
+          undefined,
+          {
+            ...localConfig,
+            refreshInterval: undefined,
+          },
+          globalConfig,
+        ),
+      ).toEqual({
+        ...localConfig,
+        refreshInterval: globalConfig.refreshInterval,
+      });
+
+      expect(mergeConfigs('auth', undefined, globalConfig)).toEqual({
+        ...globalConfig,
+        services: undefined,
+        service: MOCK_SERVICES[0],
+      });
     });
   });
 });
