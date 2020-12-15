@@ -40,7 +40,7 @@
   },
   "homepage": "https://github.com/webscopeio/react-health-check#readme",
   "devDependencies": {
-    "@rollup/plugin-typescript": "~6.1.0",
+    "@rollup/plugin-typescript": "~8.1.0",
     "@types/jest": "~26.0.12",
     "@types/node": "~14.14.6",
     "@types/react": "~16.9.48",
