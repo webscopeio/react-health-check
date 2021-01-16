@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useContext, useMemo, useRef } from 'react';
+import { useEffect, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import HealthCheckConfig from './config';
 
 import { checkServiceHealth, mergeConfigs, updateServiceState } from './helpers';
@@ -26,23 +26,26 @@ function useHealthCheck<S = string>(
 
   const config = mergeConfigs(serviceName, localConfig, globalConfig);
 
+  const [, rerender] = useState(null);
   const serviceState = useRef({
     service: config.service,
     available: true,
-    since: Date.now(),
-    last: null,
+    timestamp: Date.now(),
   });
 
   const checkService = useCallback(async (config: LocalConfigInterface) => {
     const { service } = config;
     const checkResult = await checkServiceHealth(service);
 
-    serviceState.current = updateServiceState(serviceState.current, checkResult);
+    if (serviceState.current.available != checkResult.available) {
+      serviceState.current = updateServiceState(serviceState.current, checkResult);
+      rerender({});
+    }
   }, []);
 
   const refreshService = useCallback(async () => {
     await checkService(config);
-  }, [checkService]);
+  }, [config, checkService]);
 
   const startCheckingInterval = useCallback(() => {
     return setInterval(() => {
@@ -69,10 +72,6 @@ function useHealthCheck<S = string>(
   useEffect(() => {
     const state = serviceState.current;
 
-    if (state.since !== state.last) {
-      return;
-    }
-
     if (state.available) {
       typeof config.onSuccess === 'function' && config.onSuccess(state);
 
@@ -86,10 +85,10 @@ function useHealthCheck<S = string>(
     return {
       service: serviceState.current.service,
       available: serviceState.current.available,
-      since: serviceState.current.since,
+      timestamp: serviceState.current.timestamp,
       refresh: refreshService,
     };
-  }, [refreshService, serviceState.current.available]);
+  }, [refreshService, serviceState]);
 
   return memoizedState;
 }

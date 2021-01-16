@@ -37,11 +37,10 @@ export const updateServiceState = (
 ): ServiceState => ({
   service: checkResult.service,
   available: checkResult.available,
-  since:
-    !prevState.since || prevState.available != checkResult.available
+  timestamp:
+    !prevState.timestamp || prevState.available != checkResult.available
       ? checkResult.timestamp
-      : prevState.since,
-  last: checkResult.timestamp,
+      : prevState.timestamp,
 });
 
 /**

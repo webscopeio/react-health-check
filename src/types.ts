@@ -21,8 +21,7 @@ export type Service<S = string> = {
 export type ServiceState<S = string> = {
   service: Service<S>;
   available: boolean;
-  since: number;
-  last: number;
+  timestamp: number;
 };
 
 export type ServiceHealthCheckResult = {

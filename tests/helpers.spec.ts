@@ -86,8 +86,7 @@ describe('Helpers', () => {
       const PREV_STATE: ServiceState = {
         service: MOCK_SERVICES[0],
         available: true,
-        since: null,
-        last: null,
+        timestamp: null,
       };
 
       const CHECK_RESULT: ServiceHealthCheckResult = {
@@ -99,8 +98,7 @@ describe('Helpers', () => {
       const NEXT_STATE: ServiceState = {
         service: MOCK_SERVICES[0],
         available: false,
-        since: Date.now(),
-        last: Date.now(),
+        timestamp: Date.now(),
       };
 
       expect(updateServiceState(PREV_STATE, CHECK_RESULT)).toEqual(NEXT_STATE);
@@ -112,13 +110,12 @@ describe('Helpers', () => {
         available: true,
       });
 
-      PREV_STATE.since = Date.now() - 1;
+      PREV_STATE.timestamp = Date.now() - 1;
 
       expect(updateServiceState(PREV_STATE, CHECK_RESULT)).toEqual({
         ...NEXT_STATE,
         available: true,
-        since: Date.now() - 1,
-        last: Date.now(),
+        timestamp: Date.now() - 1,
       });
     });
   });

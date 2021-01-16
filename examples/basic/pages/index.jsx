@@ -26,6 +26,8 @@ export default function Home() {
     refreshInterval: 2000,
   });
 
+  console.log(available)
+
   return (
     <div className="container">
       <div className="health-wrapper">
