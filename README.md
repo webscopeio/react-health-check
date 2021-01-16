@@ -29,16 +29,16 @@ yarn add @webscopeio/react-health-check
 ## Usage ❓
 
 ```ts
-const { available } = useHealthCheck({
+const { available, refresh } = useHealthCheck({
   service: {
     name: 'auth',
     url: 'https://example.com/auth/health',
   },
-  onSuccess: ({ service, since }) => {
-    console.log(`Service "${service.name}" is available since "${since}" 🎉`);
+  onSuccess: ({ service, timestamp }) => {
+    console.log(`Service "${service.name}" is available since "${timestamp}" 🎉`);
   },
-  onError: ({ service, since }) => {
-    console.log(`Service "${service.name}" is not available since "${since}" 😔`);
+  onError: ({ service, timestamp }) => {
+    console.log(`Service "${service.name}" is not available since "${timestamp}" 😔`);
   },
 });
 ```
@@ -59,11 +59,11 @@ You can also create a global configuration so you don't have to define services 
         url: 'https://example.com/payment/health',
       },
     ],
-    onSuccess: ({ service, since }) => {
-      console.log(`Service "${service.name}" is available since "${since}" 🎉`);
+    onSuccess: ({ service, timestamp }) => {
+      console.log(`Service "${service.name}" is available since "${timestamp}" 🎉`);
     },
-    onError: ({ service, since }) => {
-      console.log(`Service "${service.name}" is not available since "${since}" 😔`);
+    onError: ({ service, timestamp }) => {
+      console.log(`Service "${service.name}" is not available since "${timestamp}" 😔`);
     },
   }}
 >
