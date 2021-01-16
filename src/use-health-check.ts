@@ -80,7 +80,7 @@ function useHealthCheck<S = string>(
     } else {
       typeof config.onError === 'function' && config.onError(state);
     }
-  }, [config]);
+  }, [config, serviceState]);
 
   const memoizedState = useMemo<ServiceHealthCheckReturn>(() => {
     return {
