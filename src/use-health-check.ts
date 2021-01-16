@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useEffect, useCallback, useContext, useMemo, useRef } from 'react';
 import HealthCheckConfig from './config';
 
 import { checkServiceHealth, mergeConfigs, updateServiceState } from './helpers';
-import { LocalConfigInterface, ServiceHealthCheckReturn, ServiceState } from './types';
+import { LocalConfigInterface, ServiceHealthCheckReturn } from './types';
 
 /* useHealthCheck
 ============================================================================= */
@@ -26,7 +26,7 @@ function useHealthCheck<S = string>(
 
   const config = mergeConfigs(serviceName, localConfig, globalConfig);
 
-  const [state, setState] = useState<ServiceState>({
+  const serviceState = useRef({
     service: config.service,
     available: true,
     since: Date.now(),
@@ -37,11 +37,12 @@ function useHealthCheck<S = string>(
     const { service } = config;
     const checkResult = await checkServiceHealth(service);
 
-    setState((prevState) => ({
-      ...updateServiceState(prevState, checkResult),
-      service,
-    }));
+    serviceState.current = updateServiceState(serviceState.current, checkResult);
   }, []);
+
+  const refreshService = useCallback(async () => {
+    await checkService(config);
+  }, [checkService]);
 
   const startCheckingInterval = useCallback(() => {
     return setInterval(() => {
@@ -66,6 +67,8 @@ function useHealthCheck<S = string>(
   }, [startCheckingInterval]);
 
   useEffect(() => {
+    const state = serviceState.current;
+
     if (state.since !== state.last) {
       return;
     }
@@ -77,14 +80,18 @@ function useHealthCheck<S = string>(
     } else {
       typeof config.onError === 'function' && config.onError(state);
     }
-  }, [config, state]);
+  }, [config]);
 
-  return {
-    ...state,
-    refresh: async () => {
-      await checkService(config);
-    },
-  };
+  const memoizedState = useMemo<ServiceHealthCheckReturn>(() => {
+    return {
+      service: serviceState.current.service,
+      available: serviceState.current.available,
+      since: serviceState.current.since,
+      refresh: refreshService,
+    };
+  }, [refreshService, serviceState.current.available]);
+
+  return memoizedState;
 }
 
 export default useHealthCheck;
