@@ -33,4 +33,4 @@ export type ServiceHealthCheckResult = {
 
 export type ServiceHealthCheckReturn = {
   refresh: () => Promise<void>;
-} & ServiceState;
+} & Omit<ServiceState, 'last'>;
