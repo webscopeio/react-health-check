@@ -5,6 +5,7 @@
 
 # misc
 .vscode
+.idea
 .DS_Store
 *.pem
 .github
@@ -19,3 +20,4 @@ rollup.config.js
 tsconfig.eslint.json
 tsconfig.json
 jest.config.js
+.license-sh.json
