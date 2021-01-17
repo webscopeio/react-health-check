@@ -4,8 +4,6 @@ import HealthCheckConfig from './config';
 import { checkServiceHealth, mergeConfigs, updateServiceState } from './helpers';
 import { LocalConfigInterface, ServiceHealthCheckReturn } from './types';
 
-/* useHealthCheck
-============================================================================= */
 function useHealthCheck<S = string>(serviceName: S): ServiceHealthCheckReturn;
 function useHealthCheck<S = string>(
   serviceName: S,
@@ -30,7 +28,7 @@ function useHealthCheck<S = string>(
   const serviceState = useRef({
     service: config.service,
     available: true,
-    timestamp: Date.now(),
+    timestamp: null,
   });
 
   const checkService = useCallback(async (config: LocalConfigInterface) => {
@@ -59,7 +57,7 @@ function useHealthCheck<S = string>(
 
       checkService(config);
     }, config.refreshInterval);
-  }, [config, checkService]);
+  }, [checkService]);
 
   useEffect(() => {
     const intervalId = startCheckingInterval();
@@ -72,14 +70,17 @@ function useHealthCheck<S = string>(
   useEffect(() => {
     const state = serviceState.current;
 
+    if (!state.timestamp) {
+      return;
+    }
+
     if (state.available) {
       typeof config.onSuccess === 'function' && config.onSuccess(state);
-
       return;
     } else {
       typeof config.onError === 'function' && config.onError(state);
     }
-  }, [config, serviceState]);
+  }, [serviceState.current.available]);
 
   const memoizedState = useMemo<ServiceHealthCheckReturn>(() => {
     return {
@@ -88,7 +89,7 @@ function useHealthCheck<S = string>(
       timestamp: serviceState.current.timestamp,
       refresh: refreshService,
     };
-  }, [refreshService, serviceState]);
+  }, [refreshService]);
 
   return memoizedState;
 }
