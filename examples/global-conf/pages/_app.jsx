@@ -15,19 +15,19 @@ function MyApp({ Component, pageProps }) {
             url: '/api/health',
           },
         ],
-        onSuccess: ({ service, since }) => {
+        onSuccess: ({ service, timestamp }) => {
           toast.success(
             <>
               Service <strong>"{service.name}"</strong> is available since: <br />{' '}
-              {Date(since).toString()} 🎉
+              {Date(timestamp).toString()} 🎉
             </>,
           );
         },
-        onError: ({ service, since }) => {
+        onError: ({ service, timestamp }) => {
           toast.error(
             <>
               Service <strong>"{service.name}"</strong> is not available since: <br />{' '}
-              {Date(since).toString()} 😔
+              {Date(timestamp).toString()} 😔
             </>,
           );
         },
