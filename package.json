@@ -15,9 +15,7 @@
     "preversion": "npm test",
     "version": "npm run build",
     "postversion": "git push && git push --tags",
-    "package-size": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz",
-    "publish": "npm publish --access public",
-    "publish:next": "npm publish --access public --tag next"
+    "package-size": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz"
   },
   "repository": {
     "type": "git",
