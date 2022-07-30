@@ -8,5 +8,5 @@ export default {
     format: 'cjs',
   },
   plugins: [typescript(), terser()],
-  external: ['react'],
+  external: ['react', 'react-dom'],
 };
